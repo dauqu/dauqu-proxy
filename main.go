@@ -13,7 +13,7 @@ import (
 //Create JSON data
 var jsonData = []byte(`{
 	"domain": "d.setkaro.com",
-	"proxy": "http://localhost:5556",
+	"proxy": "localhost:5556",
 	"headers": ["X-Forwarded-For", "X-Forwarded-Proto", "X-Forwarded-Host", "X-Forwarded-Port"],
 	"sll": true
 }`)
