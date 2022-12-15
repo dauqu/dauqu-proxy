@@ -41,21 +41,24 @@ func main() {
 	router := gin.Default()
 
 	//Create proxy
-	proxy := router.Group(details.Domain)
-	{
-		proxy.Use(func(c *gin.Context) {
-			for _, header := range details.Headers {
-				c.Request.Header.Set(header, c.Request.Header.Get(header))
-			}
+	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Scheme: "http",
+		Host:   details.Proxy,
+	})
+
+	//Create proxy handler
+	proxyHandler := func(c *gin.Context) {
+		proxy.ServeHTTP(c.Writer, c.Request)
+	}
+
+	//Create proxy route
+	router.Any("/*path", proxyHandler)
+
+	//Add headers
+	for _, header := range details.Headers {
+		router.Use(func(c *gin.Context) {
+			c.Writer.Header().Set(header, c.Request.Header.Get(header))
 			c.Next()
-		})
-		
-		proxy.Any("/*path", func(c *gin.Context) {
-			proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-				Scheme: "http",
-				Host:   details.Proxy,
-			})
-			proxy.ServeHTTP(c.Writer, c.Request)
 		})
 	}
 
