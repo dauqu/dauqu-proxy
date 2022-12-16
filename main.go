@@ -109,23 +109,12 @@ func main() {
 
 	//Create proxy
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "https",
+		Scheme: "http",
 		Host:   "https://www.google.com",
 	})
 
-	//Create proxy header
-	proxy.Director = func(req *http.Request) {
-		req.Header.Set("X-Forwarded-Host", req.Host)
-		req.Header.Set("X-Origin-Host", req.Host)
-		req.Header.Set("X-Forwarded-Proto", "https")
-		req.Header.Set("X-Forwarded-Port", "443")
-		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
-		req.URL.Scheme = "http"
-		req.URL.Host = "https://www.google.com"
-	}
-
 	//Create route
-	http.HandleFunc("/", handler(proxy))
+	http.HandleFunc("a.setkaro.com", handler(proxy))
 
 	//Create autocert manager
 	m := autocert.Manager{
