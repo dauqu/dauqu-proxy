@@ -107,7 +107,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	vhost, err := url.Parse("https://www.google.com")
+	vhost, err := url.Parse("http://localhost:44593")
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +124,7 @@ func main() {
 	//Create autocert manager
 	m := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("a.setkaro.com"),
+		HostPolicy: autocert.HostWhitelist("a.setkaro.com" ),
 		Cache:      autocert.DirCache("certs"),
 	}
 
