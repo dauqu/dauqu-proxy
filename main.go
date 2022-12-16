@@ -118,16 +118,19 @@ func main() {
 		Host:   vhost.Host,
 	})
 
-	// 		//Set Header
+	//Set Header
 	proxy.Director = func(req *http.Request) {
 		req.Header.Set("X-Forwarded-Host", req.Host)
 		req.Header.Set("X-Origin-Host", vhost.Host)
-		req.Header.Set("X-Forwarded-Proto", "https")
-		req.Header.Set("X-Forwarded-Port", "443")
 		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 		req.URL.Scheme = vhost.Scheme
 		req.URL.Host = vhost.Host
 	}
+
+	//Create handler
+	mux.HandleFunc("b.setkaro.com/", func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	})
 
 	//Create autocert manager
 	m := autocert.Manager{
@@ -148,20 +151,9 @@ func main() {
 		Handler:   mux,
 	}
 
-	//Create handler
-	mux.HandleFunc("b.setkaro.com", handler(proxy))
-
 	//Listen on port 80
 	go http.ListenAndServe(":80", m.HTTPHandler(nil))
 
 	//Listen on port 443
 	s.ListenAndServeTLS("", "")
-}
-
-func handler(p *httputil.ReverseProxy) func(http.ResponseWriter,
-	*http.Request) {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		p.ServeHTTP(w, r)
-	}
 }
