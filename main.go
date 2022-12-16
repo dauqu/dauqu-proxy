@@ -115,7 +115,7 @@ func main() {
 	//Create autocert manager
 	m := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("localhost"),
+		HostPolicy: autocert.HostWhitelist("a.setkaro.com"),
 		Cache:      autocert.DirCache("certs"),
 	}
 
