@@ -4,86 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http/httputil"
-	"net/url"
-
-	// "github.com/gin-gonic/autotls"
-	"github.com/gin-gonic/gin"
+	"os"
 )
 
-// Create JSON data
-var jsonData = []byte(`[
-	{
-		"domain": "localhost/1",
-		"proxy": "localhost:58441",
-		"headers": ["X-Forwarded-For", "X-Forwarded-Proto", "X-Forwarded-Host", "X-Forwarded-Port"],
-		"ssl": true
-	},
-	{
-		"domain": "localhost/2",
-		"proxy": "localhost:56710",
-		"headers": ["X-Forwarded-For", "X-Forwarded-Proto", "X-Forwarded-Host", "X-Forwarded-Port"],
-		"ssl": false
-	}
-]`)
+type Domains struct {
+	Domain  string   `json:"domain"`
+	Proxy   string   `json:"proxy"`
+	SSL     bool     `json:"ssl"`
+}
 
 func main() {
 
-	//Create Details struct
-	type Details struct {
-		Domain  string   `json:"domain"`
-		Proxy   string   `json:"proxy"`
-		Headers []string `json:"headers"`
-		SSL     bool     `json:"sll"`
-	}
-
-	//Bind JSON to Details struct
-	var details []Details
-
-	//Unmarshal JSON
-	err := json.Unmarshal(jsonData, &details)
+	//Read JSON file
+	jsonFile, err := os.ReadFile("dauqu.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//Print details
-	fmt.Println(details)
+	fmt.Println("Successfully Opened dauqu.json")
 
-	//Loop through details
-	for _, i := range details {
+	var dauqu []Domains
 
-		//Create Gin router
-		router := gin.Default()
+	//Unmarshal JSON file
+	err = json.Unmarshal(jsonFile, &dauqu)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		//Create proxy
-		proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-			Scheme: "http",
-			Host:   i.Proxy,
-		})
-
-		//Create proxy handler
-		proxyHandler := func(c *gin.Context) {
-			proxy.ServeHTTP(c.Writer, c.Request)
-		}
-
-		//Create proxy route
-		router.Any("/*path", proxyHandler)
-
-		//Add headers
-		// for _, header := range details.Headers {
-		// 	router.Use(func(c *gin.Context) {
-		// 		c.Writer.Header().Set(header, c.Request.Header.Get(header))
-		// 		c.Next()
-		// 	})
-		// }
-
-		//Start server
-		// if i.SSL {
-		// 	autotls.Run(router, i.Domain)
-		// } else {
-		// 	router.Run(i.Domain)
-		// }
-
-		router.Run(":80")
+	//Loop through the JSON file
+	for i := 0; i < len(dauqu); i++ {
+		fmt.Println("Domain:", dauqu[i].Domain)
+		fmt.Println("Proxy:", dauqu[i].Proxy)
+		fmt.Println("SSL:", dauqu[i].SSL)
 	}
 }

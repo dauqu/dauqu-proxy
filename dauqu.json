@@ -3,7 +3,7 @@
         "domain": "http://localhost/0",
         "proxy": "http://localhost:58851",
         "headers": {
-           
+            "X-Forwarded-Host": "localhost"
         },
         "ssl": true
     },
@@ -11,7 +11,7 @@
         "domain": "http://localhost/1",
         "proxy": "http://localhost:58330",
         "headers": {
-           
+            "X-Forwarded-Host": "localhost"
         },
         "ssl": true
     },
@@ -19,7 +19,7 @@
         "domain": "http://localhost/3",
         "proxy": "http://localhost:58330",
         "headers": {
-            
+            "X-Forwarded-Host": "localhost"
         },
         "ssl": true
     }
