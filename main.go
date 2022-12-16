@@ -132,7 +132,7 @@ func main() {
 	//Create autocert manager
 	m := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("a.setkaro.com"),
+		HostPolicy: autocert.HostWhitelist("b.setkaro.com"),
 		Cache:      autocert.DirCache("certs"),
 	}
 
@@ -149,7 +149,7 @@ func main() {
 	}
 
 	//Create handler
-	mux.HandleFunc("a.setkaro.com", handler(proxy))
+	mux.HandleFunc("b.setkaro.com", handler(proxy))
 
 	//Listen on port 80
 	go http.ListenAndServe(":80", m.HTTPHandler(nil))
