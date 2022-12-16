@@ -1,26 +1,17 @@
 [
     {
         "domain": "a.setkaro.com",
-        "proxy": "http://localhost:5556",
-        "headers": {
-            
-        },
+        "proxy": "https://www.google.com",
         "ssl": false
     },
     {
         "domain": "b.setkaro.com",
-        "proxy": "http://localhost:5556",
-        "headers": {
-            
-        },
+        "proxy": "https://www.google.com",
         "ssl": true
     },
     {
         "domain": "c.setkaro.com",
-        "proxy": "http://localhost:36831",
-        "headers": {
-           
-        },
+        "proxy": "https://www.google.com",
         "ssl": true
     }
 ]
