@@ -151,7 +151,6 @@ func main() {
 
 	//Listen on port 443
 	s.ListenAndServeTLS("", "")
-
 }
 
 func handler(p *httputil.ReverseProxy) func(http.ResponseWriter,
