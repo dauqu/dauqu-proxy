@@ -116,12 +116,12 @@ func main() {
 	//Create proxy header
 	proxy.Director = func(req *http.Request) {
 		req.Header.Set("X-Forwarded-Host", req.Host)
-		req.Header.Set("X-Origin-Host", "localhost:8080")
+		req.Header.Set("X-Origin-Host", req.Host)
 		req.Header.Set("X-Forwarded-Proto", "https")
 		req.Header.Set("X-Forwarded-Port", "443")
 		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 		req.URL.Scheme = "http"
-		req.URL.Host = "localhost:8080"
+		req.URL.Host = "https://www.google.com"
 	}
 
 	//Create route
