@@ -6,12 +6,12 @@
     },
     {
         "domain": "b.setkaro.com",
-        "proxy": "https://www.google.com",
+        "proxy": "https://www.facebook.com",
         "ssl": true
     },
     {
         "domain": "c.setkaro.com",
-        "proxy": "https://www.google.com",
+        "proxy": "https://goenning.net",
         "ssl": true
     }
 ]
