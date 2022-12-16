@@ -1,7 +1,7 @@
 [
     {
         "domain": "a.setkaro.com",
-        "proxy": "http://localhost:53270",
+        "proxy": "http://localhost:5556",
         "headers": {
             
         },
