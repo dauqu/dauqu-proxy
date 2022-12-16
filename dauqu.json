@@ -1,25 +1,25 @@
 [
     {
-        "domain": "http://localhost/0",
-        "proxy": "http://localhost:58851",
+        "domain": "a.setkaro.com",
+        "proxy": "http://localhost:53270",
         "headers": {
-            "X-Forwarded-Host": "localhost"
+            
         },
         "ssl": true
     },
     {
-        "domain": "http://localhost/1",
-        "proxy": "http://localhost:58330",
+        "domain": "b.setkaro.com",
+        "proxy": "http://localhost:5556",
         "headers": {
-            "X-Forwarded-Host": "localhost"
+            
         },
         "ssl": true
     },
     {
-        "domain": "http://localhost/3",
-        "proxy": "http://localhost:58330",
+        "domain": "c.setkaro.com",
+        "proxy": "http://localhost:36831",
         "headers": {
-            "X-Forwarded-Host": "localhost"
+           
         },
         "ssl": true
     }
