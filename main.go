@@ -107,14 +107,19 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	vhost, err := url.Parse("https://www.google.com")
+	if err != nil {
+		panic(err)
+	}
+
 	//Create proxy
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: "http",
-		Host:   "https://www.google.com",
+		Scheme: vhost.Scheme,
+		Host:   vhost.Host,
 	})
 
 	//Create route
-	http.HandleFunc("a.setkaro.com", handler(proxy))
+	mux.HandleFunc("a.setkaro.com", handler(proxy))
 
 	//Create autocert manager
 	m := autocert.Manager{
