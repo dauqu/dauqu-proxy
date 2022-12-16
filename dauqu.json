@@ -5,7 +5,7 @@
         "headers": {
             
         },
-        "ssl": true
+        "ssl": false
     },
     {
         "domain": "b.setkaro.com",

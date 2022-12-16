@@ -2,18 +2,21 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 
 	"golang.org/x/crypto/acme/autocert"
 )
 
-// type Domains struct {
-// 	Domain string `json:"domain"`
-// 	Proxy  string `json:"proxy"`
-// 	SSL    bool   `json:"ssl"`
-// }
+type Domains struct {
+	Domain string `json:"domain"`
+	Proxy  string `json:"proxy"`
+	SSL    bool   `json:"ssl"`
+}
 
 // func main() {
 
@@ -105,55 +108,78 @@ import (
 
 func main() {
 
+	// 	//Read JSON file
+	jsonFile, err := os.ReadFile("dauqu.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 	fmt.Println("Successfully Opened dauqu.json")
+
+	var dauqu []Domains
+
+	// 	//Unmarshal JSON file
+	err = json.Unmarshal(jsonFile, &dauqu)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := http.NewServeMux()
 
-	vhost, err := url.Parse("http://localhost:44593")
-	if err != nil {
-		panic(err)
+	//Lpp through domains
+	for _, domain := range dauqu {
+
+		vhost, err := url.Parse(domain.Proxy)
+		if err != nil {
+			panic(err)
+		}
+
+		//Create proxy
+		proxy := httputil.NewSingleHostReverseProxy(&url.URL{
+			Scheme: vhost.Scheme,
+			Host:   vhost.Host,
+		})
+
+		//Set Header
+		proxy.Director = func(req *http.Request) {
+			req.Header.Set("X-Forwarded-Host", req.Host)
+			req.Header.Set("X-Origin-Host", vhost.Host)
+			req.Header.Set("X-Forwarded-For", req.RemoteAddr)
+			req.URL.Scheme = vhost.Scheme
+			req.URL.Host = vhost.Host
+		}
+
+		//Create handler
+		mux.HandleFunc(domain.Domain, func(w http.ResponseWriter, r *http.Request) {
+			proxy.ServeHTTP(w, r)
+		})
+
+		//Create autocert manager
+		m := autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(domain.Domain),
+			Cache:      autocert.DirCache("certs"),
+		}
+
+		//Create TLS config
+		tlsConfig := &tls.Config{
+			GetCertificate: m.GetCertificate,
+		}
+
+		//Create server
+		s := &http.Server{
+			Addr:      ":443",
+			TLSConfig: tlsConfig,
+			Handler:   mux,
+		}
+
+		//Listen on port 443
+		s.ListenAndServeTLS("", "")
+
+		if domain.SSL {
+			s.ListenAndServeTLS("", "")
+		} else {
+			go http.ListenAndServe(":80", nil)
+		}
 	}
-
-	//Create proxy
-	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Scheme: vhost.Scheme,
-		Host:   vhost.Host,
-	})
-
-	//Set Header
-	proxy.Director = func(req *http.Request) {
-		req.Header.Set("X-Forwarded-Host", req.Host)
-		req.Header.Set("X-Origin-Host", vhost.Host)
-		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
-		req.URL.Scheme = vhost.Scheme
-		req.URL.Host = vhost.Host
-	}
-
-	//Create handler
-	mux.HandleFunc("b.setkaro.com/", func(w http.ResponseWriter, r *http.Request) {
-		proxy.ServeHTTP(w, r)
-	})
-
-	//Create autocert manager
-	m := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("b.setkaro.com"),
-		Cache:      autocert.DirCache("certs"),
-	}
-
-	//Create TLS config
-	tlsConfig := &tls.Config{
-		GetCertificate: m.GetCertificate,
-	}
-
-	//Create server
-	s := &http.Server{
-		Addr:      ":443",
-		TLSConfig: tlsConfig,
-		Handler:   mux,
-	}
-
-	//Listen on port 80
-	go http.ListenAndServe(":80", m.HTTPHandler(nil))
-
-	//Listen on port 443
-	s.ListenAndServeTLS("", "")
 }
