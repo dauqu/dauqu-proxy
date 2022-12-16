@@ -174,7 +174,7 @@ func main() {
 		}
 
 		//Listen on port 443
-		s.ListenAndServeTLS("", "")
+		// s.ListenAndServeTLS("", "")
 
 		if domain.SSL {
 			s.ListenAndServeTLS("", "")
