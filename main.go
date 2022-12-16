@@ -118,13 +118,21 @@ func main() {
 		Host:   vhost.Host,
 	})
 
-	//Create route
-	mux.HandleFunc("a.setkaro.com", handler(proxy))
+	// 		//Set Header
+	proxy.Director = func(req *http.Request) {
+		req.Header.Set("X-Forwarded-Host", req.Host)
+		req.Header.Set("X-Origin-Host", vhost.Host)
+		req.Header.Set("X-Forwarded-Proto", "https")
+		req.Header.Set("X-Forwarded-Port", "443")
+		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
+		req.URL.Scheme = vhost.Scheme
+		req.URL.Host = vhost.Host
+	}
 
 	//Create autocert manager
 	m := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("a.setkaro.com" ),
+		HostPolicy: autocert.HostWhitelist("a.setkaro.com"),
 		Cache:      autocert.DirCache("certs"),
 	}
 
@@ -139,6 +147,9 @@ func main() {
 		TLSConfig: tlsConfig,
 		Handler:   mux,
 	}
+
+	//Create handler
+	mux.HandleFunc("a.setkaro.com", handler(proxy))
 
 	//Listen on port 80
 	go http.ListenAndServe(":80", m.HTTPHandler(nil))
