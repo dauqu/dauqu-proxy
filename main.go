@@ -3,13 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/autotls"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-
-	"github.com/gin-gonic/autotls"
 )
 
 type Domains struct {
@@ -39,8 +38,6 @@ func main() {
 	mux := http.NewServeMux()
 
 	var domains []string
-
-	
 
 	//Loop through domains
 	for _, domain := range dauqu {
@@ -80,8 +77,6 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		})
 	}
-
-	
 
 	//Listen and serve
 	autotls.Run(mux, domains...)

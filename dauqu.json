@@ -26,12 +26,12 @@
     },
     {
         "domain": "a.datecaro.com",
-        "proxy": "https://www.facebook.com",
+        "proxy": "http://localhost:8888",
         "ssl": true
     },
     {
         "domain": "b.datecaro.com",
-        "proxy": "https://www.google.com",
+        "proxy": "http://localhost:44593",
         "ssl": true
     }
 ]
