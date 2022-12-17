@@ -30,8 +30,10 @@ require (
 )
 
 require (
+	github.com/artyom/autoflags v1.1.1
 	github.com/gin-gonic/autotls v0.0.5
 	github.com/gin-gonic/gin v1.8.1
+	github.com/gorilla/mux v1.8.0
 	github.com/yuin/goldmark v1.4.13 // indirect
 	go.mongodb.org/mongo-driver v1.11.1
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
