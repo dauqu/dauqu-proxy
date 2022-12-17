@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,7 +9,7 @@ import (
 	"net/url"
 	"os"
 
-	"golang.org/x/crypto/acme/autocert"
+	// "github.com/gin-gonic/autotls"
 )
 
 type Domains struct {
@@ -39,8 +38,15 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	var domains []string
+
+	
+
 	//Loop through domains
 	for _, domain := range dauqu {
+
+		//Add domain to domains
+		domains = append(domains, domain.Domain)
 
 		vhost, err := url.Parse(domain.Proxy)
 		if err != nil {
@@ -70,29 +76,13 @@ func main() {
 			return nil
 		}
 
-		mux.Handle(domain.Domain+"/", proxy)
+		mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
+			proxy.ServeHTTP(w, r)
+		})
 	}
 
-	// 		//Create autocert manager
-	m := autocert.Manager{
-		Prompt: autocert.AcceptTOS,
-		// HostPolicy: autocert.HostWhitelist("a.setkaro.com", "b.setkaro.com", "c.setkaro.com", "d.setkaro.com", "e.setkaro.com"),
-		Cache: autocert.DirCache("letsencrypt"),
-		Email: "info@dauqu.com",
-	}
-
-	// 		//Create server
-	server := &http.Server{
-		Addr:    ":443",
-		Handler: mux,
-		TLSConfig: &tls.Config{
-			GetCertificate: m.GetCertificate,
-		},
-	}
-
-	// 		//Listen and serve
+	
 
 	//Listen and serve
-	go http.ListenAndServe(":80", nil)
-	server.ListenAndServeTLS("", "")
+	autotls.Run(mux, domains...)
 }
