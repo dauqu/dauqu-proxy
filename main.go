@@ -19,6 +19,12 @@ type Domains struct {
 
 func main() {
 
+	//Get hostname
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// 	//Read JSON file
 	jsonFile, err := os.ReadFile("/var/dauqu/dauqu.json")
 	if err != nil {
@@ -34,6 +40,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//Add default domain to dauqu
+	dauqu = append(dauqu, Domains{
+		Domain: hostname,
+		Proxy:  "http://localhost:9000",
+		SSL:    true,
+	})
 
 	mux := http.NewServeMux()
 
@@ -77,6 +90,9 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		})
 	}
+
+	//Add hostname to domains
+	domains = append(domains, hostname)
 
 	//Listen and serve
 	autotls.Run(mux, domains...)
