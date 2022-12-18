@@ -26,17 +26,17 @@ func main() {
 	}
 
 	// 	//Read JSON file
-	jsonFile, err := os.ReadFile("dauqu.json")
+	jsonFile, err := os.ReadFile("/var/dauqu/dauqu.json")
 	if err != nil {
 		//If file not found create new file
 		if os.IsNotExist(err) {
-			_, err = os.Create("dauqu.json")
+			_, err = os.Create("/var/dauqu/dauqu.json")
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			//Write to file
-			err = os.WriteFile("dauqu.json", []byte("[]"), 0644)
+			err = os.WriteFile("/var/dauqu/dauqu.json", []byte("[]"), 0644)
 			if err != nil {
 				log.Fatal(err)
 			}
