@@ -95,7 +95,14 @@ func main() {
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				proxy.ServeHTTP(w, r)
+				//if proxy not found show 404
+				if domain.Proxy == "" {
+					//show 404.html file
+					http.ServeFile(w, r, "/var/dauqu/404.html")
+					return
+				} else {
+					proxy.ServeHTTP(w, r)
+				}
 			})
 		}
 	}
