@@ -88,16 +88,14 @@ func main() {
 			//Header response
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("Server", "Setkaro")
-				resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
-				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 				resp.Header.Set("X-Forwarded-Proto", "https")
 				return nil
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				//if proxy not found show 404
-				if domain.Proxy == "" {
-					//show 404.html file
+				if vhost.Host == "" {
+					//404.html
 					http.ServeFile(w, r, "/var/dauqu/404.html")
 					return
 				} else {
