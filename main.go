@@ -133,6 +133,11 @@ func main() {
 		return nil
 	}
 
+	//Allow to use cookie
+	proxy.Transport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+	}
+
 	mux.HandleFunc(hostname+"/", func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	})
