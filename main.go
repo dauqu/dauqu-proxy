@@ -1,14 +1,16 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/autotls"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+
+	"github.com/gin-gonic/autotls"
 )
 
 type Domains struct {
@@ -77,30 +79,37 @@ func main() {
 				Host:   vhost.Host,
 			})
 
+			proxy.Transport = &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			}
+
 			//Set Header
 			proxy.Director = func(req *http.Request) {
-				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-				req.Header.Set("Host", vhost.Host)
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
+				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+				req.Header.Set("X-Forwarded-Proto", "https")
+				req.Header.Set("Host", vhost.Host)
 			}
 
 			//Header response
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("Server", "Setkaro")
-				resp.Header.Set("X-Forwarded-Proto", "https")
 				return nil
 			}
 
+			//Allow to use cookie
+			proxy.Transport = &http.Transport{
+				Proxy: http.ProxyFromEnvironment,
+			}
+
+			//Insecure skip verify
+			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//if proxy not found show 404
-				if vhost.Host == "" {
-					//404.html
-					http.ServeFile(w, r, "/var/dauqu/404.html")
-					return
-				} else {
-					proxy.ServeHTTP(w, r)
-				}
+				proxy.ServeHTTP(w, r)
 			})
 		}
 	}
@@ -145,6 +154,8 @@ func main() {
 	//Add default domain
 	domains = append(domains, hostname)
 
+	//Run on port 80
+	go http.ListenAndServe(":80", mux)
 	//Listen and serve
 	autotls.Run(mux, domains...)
 }
