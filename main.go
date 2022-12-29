@@ -89,24 +89,13 @@ func main() {
 			proxy.Director = func(req *http.Request) {
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
-				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-				req.Header.Set("X-Forwarded-Proto", "https")
-				req.Header.Set("Host", vhost.Host)
-				req.Header.Set("X-Forwarded-For", req.RemoteAddr)
-				req.Header.Set("X-Real-IP", req.RemoteAddr)
-				req.Header.Set("X-Forwarded-Port", "443")
-				req.Header.Set("X-Forwarded-Proto", "https")
-				req.Header.Set("X-Forwarded-Protocol", "https")
-				req.Header.Set("X-Forwarded-SSL", "on")
-				req.Header.Set("X-Forwarded-Ssl", "on")
 			}
 
 			//Header response
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("Server", "Setkaro")
-				resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
-				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
-				resp.Header.Set("X-Forwarded-Proto", "https")
+				//Copy cors header
+				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 				return nil
 			}
@@ -120,13 +109,6 @@ func main() {
 			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//Copy cors header
-				w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-				//Copy cookies header
-				w.Header().Set("Cookie", r.Header.Get("Cookie"))
-				//Copy credentials header
-				w.Header().Set("Access-Control-Allow-Credentials", r.Header.Get("Credentials"))
-
 				proxy.ServeHTTP(w, r)
 			})
 		}
@@ -154,9 +136,8 @@ func main() {
 	//Header response
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		resp.Header.Set("Server", "Setkaro")
-		resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
-		resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
-		resp.Header.Set("X-Forwarded-Proto", "https")
+		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
+		resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 		return nil
 	}
 
