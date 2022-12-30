@@ -1,2 +1,0 @@
-a.setkaro.com: https://google.com
-b.setkaro.com: /var/www/html/index.html
