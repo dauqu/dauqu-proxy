@@ -104,6 +104,8 @@ func main() {
 				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 				resp.Header.Set("X-Forwarded-Proto", "https")
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
+				//Copy content type header
+				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 				return nil
 			}
 
@@ -162,6 +164,8 @@ func main() {
 		resp.Header.Set("Content-Type", "application/json")
 		//Allow cors header
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
+		//Copy content type header
+		resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 		return nil
 	}
 
