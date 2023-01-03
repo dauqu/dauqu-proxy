@@ -79,12 +79,6 @@ func main() {
 				Host:   vhost.Host,
 			})
 
-			proxy.Transport = &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true,
-				},
-			}
-
 			//Set Header
 			proxy.Director = func(req *http.Request) {
 				req.URL.Scheme = vhost.Scheme
@@ -106,6 +100,8 @@ func main() {
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 				//Copy content type header
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+				//Copy header cors
+				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				return nil
 			}
 
@@ -116,15 +112,8 @@ func main() {
 
 			//Insecure skip verify
 			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-
+			
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//Copy cors header
-				w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-				//Copy cookies header
-				w.Header().Set("Cookie", r.Header.Get("Cookie"))
-				//Copy credentials header
-				w.Header().Set("Access-Control-Allow-Credentials", r.Header.Get("Credentials"))
-
 				proxy.ServeHTTP(w, r)
 			})
 		}
