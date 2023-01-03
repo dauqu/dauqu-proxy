@@ -102,6 +102,8 @@ func main() {
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 				//Copy header cors
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
+				//Copy credentials
+				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 				return nil
 			}
 
@@ -112,7 +114,7 @@ func main() {
 
 			//Insecure skip verify
 			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-			
+
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				proxy.ServeHTTP(w, r)
 			})
