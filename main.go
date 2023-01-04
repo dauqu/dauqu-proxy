@@ -155,6 +155,8 @@ func main() {
 		resp.Header.Set("Content-Type", "application/json")
 		//Allow cors header
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
+		//Allow credentials
+		resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 		//Copy content type header
 		resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 		return nil
