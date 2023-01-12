@@ -104,6 +104,7 @@ func main() {
 				resp.Header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 				//Copy content type header
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+				resp.Header.Set("Content-Type", "application/json")
 				//Copy header cors
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				//Copy credentials
@@ -125,6 +126,7 @@ func main() {
 					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 					w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 					w.Header().Set("Access-Control-Allow-Credentials", "true")
+					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusOK)
 					return
 				}
@@ -167,6 +169,7 @@ func main() {
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 		resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 		resp.Header.Set("Content-Type", "text/html; charset=utf-8")
+		resp.Header.Set("Content-Type", "application/json")
 		return nil
 	}
 
@@ -183,6 +186,8 @@ func main() {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			//Copy content type header
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			//Add content type JSON
+			w.Header().Set("Content-Type", "application/json")
 			//Serve file over https
 			w.Header().Set("Content-Security-Policy", "upgrade-insecure-requests")
 
