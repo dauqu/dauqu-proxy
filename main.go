@@ -116,11 +116,20 @@ func main() {
 			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == "OPTIONS" {
+					w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+					w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+					w.Header().Set("Access-Control-Allow-Credentials", "true")
+					w.WriteHeader(http.StatusOK)
+					return
+				}
 				proxy.ServeHTTP(w, r)
 			})
 		}
 	}
 
+	//SERVER FOR DAUQU CONTROL PANEL
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
 		log.Fatal(err)
@@ -151,14 +160,9 @@ func main() {
 		resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 		resp.Header.Set("X-Forwarded-Proto", "https")
 		resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
-		//Allow JSON header
-		resp.Header.Set("Content-Type", "application/json")
-		//Allow cors header
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
-		//Allow credentials
 		resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
-		//Copy content type header
-		resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+		resp.Header.Set("Content-Type", "text/html; charset=utf-8")
 		return nil
 	}
 
@@ -168,7 +172,29 @@ func main() {
 	}
 
 	mux.HandleFunc(hostname+"/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			//Copy content type header
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		proxy.ServeHTTP(w, r)
+	})
+
+	http.HandleFunc(hostname+"/ui", func(w http.ResponseWriter, r *http.Request) {
+		
+		//Copy content type header
+		w.Header().Set("Content-Type", "text/html")
+
+		//SPA folder 
+		http.ServeFile(w, r, "ui/index.html")
+
+
 	})
 
 	//Add default domain
