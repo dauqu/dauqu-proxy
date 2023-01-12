@@ -186,17 +186,6 @@ func main() {
 		proxy.ServeHTTP(w, r)
 	})
 
-	http.HandleFunc(hostname+"/ui", func(w http.ResponseWriter, r *http.Request) {
-		
-		//Copy content type header
-		w.Header().Set("Content-Type", "text/html")
-
-		//SPA folder 
-		http.ServeFile(w, r, "ui/index.html")
-
-
-	})
-
 	//Add default domain
 	domains = append(domains, hostname)
 
