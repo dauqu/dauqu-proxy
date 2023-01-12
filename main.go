@@ -89,8 +89,6 @@ func main() {
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
 				req.Header.Set("X-Forwarded-Port", "443")
 				req.Header.Set("X-Forwarded-SSL", "on")
-				//Allow method
-				req.Header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 			}
 
 			//Header response
@@ -100,11 +98,8 @@ func main() {
 				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 				resp.Header.Set("X-Forwarded-Proto", "https")
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
-				//Method 
-				resp.Header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 				//Copy content type header
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
-				resp.Header.Set("Content-Type", "application/json")
 				//Copy header cors
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				//Copy credentials
@@ -123,10 +118,9 @@ func main() {
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == "OPTIONS" {
 					w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
+					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 					w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 					w.Header().Set("Access-Control-Allow-Credentials", "true")
-					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusOK)
 					return
 				}
@@ -136,6 +130,7 @@ func main() {
 	}
 
 	//SERVER FOR DAUQU CONTROL PANEL
+
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
 		log.Fatal(err)
@@ -166,10 +161,10 @@ func main() {
 		resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 		resp.Header.Set("X-Forwarded-Proto", "https")
 		resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
+		resp.Header.Set("Content-Type", "application/json")
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 		resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
-		resp.Header.Set("Content-Type", "text/html; charset=utf-8")
-		resp.Header.Set("Content-Type", "application/json")
+		resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 		return nil
 	}
 
@@ -181,16 +176,9 @@ func main() {
 	mux.HandleFunc(hostname+"/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
 			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			//Copy content type header
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			//Add content type JSON
-			w.Header().Set("Content-Type", "application/json")
-			//Serve file over https
-			w.Header().Set("Content-Security-Policy", "upgrade-insecure-requests")
-
 			w.WriteHeader(http.StatusOK)
 			return
 		}
