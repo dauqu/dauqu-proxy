@@ -89,6 +89,8 @@ func main() {
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
 				req.Header.Set("X-Forwarded-Port", "443")
 				req.Header.Set("X-Forwarded-SSL", "on")
+				//Allow method
+				req.Header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 			}
 
 			//Header response
@@ -98,6 +100,8 @@ func main() {
 				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 				resp.Header.Set("X-Forwarded-Proto", "https")
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
+				//Method 
+				resp.Header.Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 				//Copy content type header
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 				//Copy header cors
@@ -118,7 +122,7 @@ func main() {
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == "OPTIONS" {
 					w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 					w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 					w.Header().Set("Access-Control-Allow-Credentials", "true")
 					w.WriteHeader(http.StatusOK)
@@ -174,7 +178,7 @@ func main() {
 	mux.HandleFunc(hostname+"/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
 			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
 			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			//Copy content type header
