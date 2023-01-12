@@ -179,6 +179,8 @@ func main() {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			//Copy content type header
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			//Serve file over https
+			w.Header().Set("Content-Security-Policy", "upgrade-insecure-requests")
 
 			w.WriteHeader(http.StatusOK)
 			return
