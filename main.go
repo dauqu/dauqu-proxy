@@ -98,12 +98,10 @@ func main() {
 				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 				resp.Header.Set("X-Forwarded-Proto", "https")
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
-				//Copy content type header
-				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
-				//Copy header cors
+				resp.Header.Set("Content-Type", "application/json")
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
-				//Copy credentials
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
+				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
 				return nil
 			}
 
@@ -116,6 +114,7 @@ func main() {
 			proxy.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
+
 				if r.Method == "OPTIONS" {
 					w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 					w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -124,6 +123,8 @@ func main() {
 					w.WriteHeader(http.StatusOK)
 					return
 				}
+
+				//Serve http
 				proxy.ServeHTTP(w, r)
 			})
 		}
