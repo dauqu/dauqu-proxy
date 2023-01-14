@@ -180,6 +180,7 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
+
 		proxy.ServeHTTP(w, r)
 	})
 
