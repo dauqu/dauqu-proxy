@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -24,7 +23,7 @@ func main() {
 	//Get hostname
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	// 	//Read JSON file
@@ -34,16 +33,16 @@ func main() {
 		if os.IsNotExist(err) {
 			_, err = os.Create("/var/dauqu/dauqu.json")
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 
 			//Write to file
 			err = os.WriteFile("/var/dauqu/dauqu.json", []byte("[]"), 0644)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 		} else {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	}
 
@@ -54,7 +53,7 @@ func main() {
 	// 	//Unmarshal JSON file
 	err = json.Unmarshal(jsonFile, &dauqu)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	mux := http.NewServeMux()
@@ -70,7 +69,7 @@ func main() {
 
 			vhost, err := url.Parse(domain.Proxy)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 
 			//Create proxy
@@ -131,7 +130,7 @@ func main() {
 
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	//Create proxy
