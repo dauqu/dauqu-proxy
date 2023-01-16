@@ -92,7 +92,10 @@ func main() {
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("Server", "Setkaro")
 				resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
+				resp.Header.Set("X-Forwarded-Proto", "https")
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
+				resp.Header.Set("Content-Type", "application/json")
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
@@ -101,7 +104,7 @@ func main() {
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				//Check if proxy is responding or not
-				_, err := http.Get("http://localhost:9000")
+				_, err := http.Get(domain.Proxy)
 				if err != nil {
 					//Return html error
 					w.Header().Set("Content-Type", "text/html; charset=utf-8")
