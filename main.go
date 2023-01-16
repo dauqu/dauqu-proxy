@@ -1,14 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-
-	"github.com/gin-gonic/autotls"
 )
 
 type Domains struct {
@@ -18,6 +18,7 @@ type Domains struct {
 }
 
 func main() {
+	mux := http.NewServeMux()
 
 	//Get hostname
 	hostname, err := os.Hostname()
@@ -55,16 +56,14 @@ func main() {
 		fmt.Println(err)
 	}
 
-	mux := http.NewServeMux()
-
-	var domains []string
+	// var domains []string
 
 	//Loop through domains
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
 
 			//Add domain to domains
-			domains = append(domains, domain.Domain)
+			// domains = append(domains, domain.Domain)
 
 			vhost, err := url.Parse(domain.Proxy)
 			if err != nil {
@@ -78,10 +77,15 @@ func main() {
 			})
 
 			//Set Header
-			//Set Header
 			proxy.Director = func(req *http.Request) {
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
+				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+				req.Header.Set("X-Forwarded-Proto", "https")
+				req.Header.Set("X-Forwarded-For", req.RemoteAddr)
+				req.Header.Set("X-Real-IP", req.RemoteAddr)
+				req.Header.Set("X-Forwarded-Port", "443")
+				req.Header.Set("X-Forwarded-SSL", "on")
 			}
 
 			//Header response
@@ -96,18 +100,10 @@ func main() {
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//Copy all headers
-				for key, value := range r.Header {
-					for _, v := range value {
-						w.Header().Add(key, v)
-					}
-				}
 				proxy.ServeHTTP(w, r)
 			})
 		}
 	}
-
-	//SERVER FOR DAUQU CONTROL PANEL
 
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
@@ -161,14 +157,32 @@ func main() {
 			return
 		}
 
-		proxy.ServeHTTP(w, r)
+		//Check if proxy is responding or not
+		_, err := http.Get("http://localhost:9000")
+		if err != nil {
+			//Return html error
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.WriteHeader(http.StatusServiceUnavailable)
+			//Show html file
+			http.ServeFile(w, r, "./index.html")
+		} else {
+			proxy.ServeHTTP(w, r)
+		}
 	})
 
-	//Add default domain
-	domains = append(domains, hostname)
+	certManager := autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		Cache:  autocert.DirCache("/var/dauqu/cert"),
+	}
 
-	//Run on port 80
-	go http.ListenAndServe(":80", mux)
-	//Listen and serve
-	autotls.Run(mux, domains...)
+	server := &http.Server{
+		Addr:    ":443",
+		Handler: mux,
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+	}
+
+	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	server.ListenAndServeTLS("", "")
 }
