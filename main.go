@@ -175,7 +175,7 @@ func main() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusServiceUnavailable)
 			//Show html file
-			http.ServeFile(w, r, "/var/dauqu/http-server/index.html")
+			http.ServeFile(w, r, "/var/dauqu/server/index.html")
 		} else {
 			proxy.ServeHTTP(w, r)
 		}
