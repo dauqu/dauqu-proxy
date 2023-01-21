@@ -81,7 +81,7 @@ func main() {
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
 				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-				req.Header.Set("X-Forwarded-Proto", req.Header.Get("X-Forwarded-Proto"))
+				req.Header.Set("X-Forwarded-Proto", "https")
 				req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
 				req.Header.Set("X-Forwarded-Port", "443")
@@ -134,7 +134,7 @@ func main() {
 		req.URL.Scheme = vhost.Scheme
 		req.URL.Host = vhost.Host
 		req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-		req.Header.Set("X-Forwarded-Proto", req.Header.Get("X-Forwarded-Proto"))
+		req.Header.Set("X-Forwarded-Proto", "https")
 		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 		req.Header.Set("X-Real-IP", req.RemoteAddr)
 		req.Header.Set("X-Forwarded-Port", "443")
