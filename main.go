@@ -169,17 +169,19 @@ func main() {
 			return
 		}
 
-		//Check if proxy is responding or not
-		_, err := http.Get("http://localhost:9000")
-		if err != nil {
-			//Return html error
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			w.WriteHeader(http.StatusServiceUnavailable)
-			//Show html file
-			http.ServeFile(w, r, "/var/dauqu/server/index.html")
-		} else {
-			proxy.ServeHTTP(w, r)
-		}
+		// //Check if proxy is responding or not
+		// _, err := http.Get("http://localhost:9000")
+		// if err != nil {
+		// 	//Return html error
+		// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		// 	w.WriteHeader(http.StatusServiceUnavailable)
+		// 	//Show html file
+		// 	http.ServeFile(w, r, "/var/dauqu/server/index.html")
+		// } else {
+		// 	proxy.ServeHTTP(w, r)
+		// }
+
+		proxy.ServeHTTP(w, r)
 	})
 
 	certManager := autocert.Manager{
