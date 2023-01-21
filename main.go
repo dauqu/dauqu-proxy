@@ -21,7 +21,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	//Get hostname
-	_, err := os.Hostname()
+	hostname, err := os.Hostname()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -81,7 +81,7 @@ func main() {
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
 				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-				req.Header.Set("X-Forwarded-Proto", "https")
+				req.Header.Set("X-Forwarded-Proto", req.Header.Get("X-Forwarded-Proto"))
 				req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
 				req.Header.Set("X-Forwarded-Port", "443")
@@ -92,8 +92,8 @@ func main() {
 			proxy.ModifyResponse = func(resp *http.Response) error {
 				resp.Header.Set("Server", "Setkaro")
 				resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
-				// resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
-				resp.Header.Set("X-Forwarded-Proto", resp.Header.Get("X-Forwarded-Proto"))
+				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
+				resp.Header.Set("X-Forwarded-Proto",resp.Header.Get("X-Forwarded-Proto"))
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
@@ -137,7 +137,7 @@ func main() {
 		req.Header.Set("X-Forwarded-Proto", req.Header.Get("X-Forwarded-Proto"))
 		req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 		req.Header.Set("X-Real-IP", req.RemoteAddr)
-		req.Header.Set("X-Forwarded-Port", req.Header.Get("X-Forwarded-Port"))
+		req.Header.Set("X-Forwarded-Port", "443")
 		req.Header.Set("X-Forwarded-SSL", "on")
 	}
 
@@ -145,6 +145,7 @@ func main() {
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		resp.Header.Set("Server", "Setkaro")
 		resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+		resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
 		resp.Header.Set("X-Forwarded-Proto", resp.Header.Get("X-Forwarded-Proto"))
 		resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
@@ -158,7 +159,7 @@ func main() {
 		Proxy: http.ProxyFromEnvironment,
 	}
 
-	mux.HandleFunc("rishab.dauqu.host/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(hostname+"/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" {
 			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -175,7 +176,7 @@ func main() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusServiceUnavailable)
 			//Show html file
-			http.ServeFile(w, r, "/var/dauqu/server/index.html")
+			http.ServeFile(w, r, "/var/dauqu/http-server/index.html")
 		} else {
 			proxy.ServeHTTP(w, r)
 		}
@@ -194,6 +195,6 @@ func main() {
 		},
 	}
 
-	go server.ListenAndServeTLS("", "")
-	http.ListenAndServe(":80", mux)
+	go http.ListenAndServe(":80", mux)
+	server.ListenAndServeTLS("", "")
 }
