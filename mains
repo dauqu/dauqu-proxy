@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	routes "dauqu-server/routes"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/acme/autocert"
@@ -182,10 +181,6 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		}
 	})
-
-	//Post Request to add new domain
-	mux.HandleFunc("/add", routes.AddProxy)
-	mux.HandleFunc("/get", routes.GetProxies)
 
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,

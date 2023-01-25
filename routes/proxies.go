@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
 	_ "github.com/go-sql-driver/mysql"
 )
 

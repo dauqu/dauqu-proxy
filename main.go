@@ -3,13 +3,12 @@ package main
 import (
 	"crypto/tls"
 	database "dauqu-server/config"
-	routes "dauqu-server/routes"
 	"fmt"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 type Domains struct {
@@ -36,20 +35,20 @@ func main() {
 		fmt.Println(err)
 	}
 
-	//Return rows as JSON
-	type Domains struct {
-		Domain string `json:"domain"`
-		Proxy  string `json:"proxy"`
-	}
-
+	//Create array of domains
 	var dauqu []Domains
 
+	//Loop through rows
 	for rows.Next() {
 		var domain Domains
+
+		//Scan rows
 		err = rows.Scan(&domain.Domain, &domain.Proxy)
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		//Add domain to domains
 		dauqu = append(dauqu, domain)
 	}
 
@@ -59,13 +58,13 @@ func main() {
 	//Loop through domains
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
-
 			//Add domain to domains
 			// domains = append(domains, domain.Domain)
 
 			vhost, err := url.Parse(domain.Proxy)
 			if err != nil {
 				fmt.Println(err)
+				continue
 			}
 
 			//Create proxy
@@ -180,11 +179,6 @@ func main() {
 		}
 	})
 
-	//Post Request to add new domain
-	mux.HandleFunc("/add", routes.AddProxy)
-	mux.HandleFunc("/get", routes.GetProxies)
-	mux.HandleFunc("/delete", routes.DeleteProxy)
-
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
 		Cache:  autocert.DirCache("/var/dauqu/cert"),
@@ -199,5 +193,6 @@ func main() {
 	}
 
 	go http.ListenAndServe(":80", mux)
+
 	server.ListenAndServeTLS("", "")
 }
