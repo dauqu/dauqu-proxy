@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	database "dauqu-server/config"
+	actions "dauqu-server/actions"
 	"fmt"
 	"golang.org/x/crypto/acme/autocert"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 type Domains struct {
 	Domain string `json:"domain"`
 	Proxy  string `json:"proxy"`
-	SSL    bool   `json:"ssl"`
 }
 
 func main() {
@@ -100,17 +100,19 @@ func main() {
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				//Check if proxy is responding or not
-				// _, err := http.Get(domain.Proxy)
-				// if err != nil {
-				// 	//Return html error
-				// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-				// 	w.WriteHeader(http.StatusServiceUnavailable)
-				// 	//Show html file
-				// 	http.ServeFile(w, r, "/var/dauqu/http-server/index.html")
-				// } else {
-				// 	proxy.ServeHTTP(w, r)
-				// }
-				proxy.ServeHTTP(w, r)
+				_, err := http.Get(domain.Proxy)
+				if err != nil {
+					//Return html error
+					w.Header().Set("Content-Type", "text/html; charset=utf-8")
+					w.WriteHeader(http.StatusServiceUnavailable)
+					//Show html file
+					http.ServeFile(w, r, "/var/dauqu/server/index.html")
+				} else {
+					go func() {
+						actions.Counter(r)
+					}()
+					proxy.ServeHTTP(w, r)
+				}
 			})
 		}
 	}
@@ -179,11 +181,12 @@ func main() {
 		}
 	})
 
+	//Cert Manager for auto generate ssl
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
 		Cache:  autocert.DirCache("/var/dauqu/cert"),
 	}
-
+	//Create server
 	server := &http.Server{
 		Addr:    ":443",
 		Handler: mux,
@@ -192,7 +195,7 @@ func main() {
 		},
 	}
 
+	//Listen and serve http and https
 	go http.ListenAndServe(":80", mux)
-
 	server.ListenAndServeTLS("", "")
 }
