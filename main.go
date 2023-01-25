@@ -2,13 +2,14 @@ package main
 
 import (
 	"crypto/tls"
-	"encoding/json"
+	database "dauqu-server/config"
+	routes "dauqu-server/routes"
 	"fmt"
-	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 type Domains struct {
@@ -20,43 +21,40 @@ type Domains struct {
 func main() {
 	mux := http.NewServeMux()
 
-	//Get hostname
+	//Get Hostname
 	hostname, err := os.Hostname()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// 	//Read JSON file
-	jsonFile, err := os.ReadFile("/var/dauqu/dauqu.json")
-	if err != nil {
-		//If file not found create new file
-		if os.IsNotExist(err) {
-			_, err = os.Create("/var/dauqu/dauqu.json")
-			if err != nil {
-				fmt.Println(err)
-			}
+	//Get domain from database
+	db := database.Connect()
 
-			//Write to file
-			err = os.WriteFile("/var/dauqu/dauqu.json", []byte("[]"), 0644)
-			if err != nil {
-				fmt.Println(err)
-			}
-		} else {
-			fmt.Println(err)
-		}
-	}
-
-	fmt.Println("Successfully Opened dauqu.json")
-
-	var dauqu []Domains
-
-	// 	//Unmarshal JSON file
-	err = json.Unmarshal(jsonFile, &dauqu)
+	//Get all proxies
+	rows, err := db.Query("SELECT * FROM proxies")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// var domains []string
+	//Return rows as JSON
+	type Domains struct {
+		Domain string `json:"domain"`
+		Proxy  string `json:"proxy"`
+	}
+
+	var dauqu []Domains
+
+	for rows.Next() {
+		var domain Domains
+		err = rows.Scan(&domain.Domain, &domain.Proxy)
+		if err != nil {
+			fmt.Println(err)
+		}
+		dauqu = append(dauqu, domain)
+	}
+
+	//Close database connection
+	database.Close(db)
 
 	//Loop through domains
 	if len(dauqu) > 0 {
@@ -93,7 +91,7 @@ func main() {
 				resp.Header.Set("Server", "Setkaro")
 				resp.Header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
 				resp.Header.Set("Alt-Svc", "h2=\":443\"; ma=2592000")
-				resp.Header.Set("X-Forwarded-Proto",resp.Header.Get("X-Forwarded-Proto"))
+				resp.Header.Set("X-Forwarded-Proto", resp.Header.Get("X-Forwarded-Proto"))
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
@@ -181,6 +179,11 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		}
 	})
+
+	//Post Request to add new domain
+	mux.HandleFunc("/add", routes.AddProxy)
+	mux.HandleFunc("/get", routes.GetProxies)
+	mux.HandleFunc("/delete", routes.DeleteProxy)
 
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
