@@ -1,6 +1,10 @@
 # Dauqu Proxy
 
-A reverse proxy is a type of server that sits in front of an application or group of applications and directs incoming traffic to the appropriate backend server. In Golang, you can create a reverse proxy by using the http package to handle incoming requests and forwarding them to the appropriate backend server. This can be useful for load balancing, SSL termination, and other common reverse proxy tasks. When describing your reverse proxy on GitHub, it may be helpful to include information such as the specific features and capabilities of the proxy, any dependencies that are required, and instructions for how to set up and use the proxy in a production environment.
+Dauqu Proxy is an open-source program written in Go that serves as an alternative to the popular web server, nginx. It offers several advanced features that make it a powerful option for hosting and managing web applications. One of the key features of Dauqu Proxy is its ability to handle automatic SSL, which eliminates the need for manual configuration and maintenance of SSL certificates. This can save significant time and effort for developers and system administrators.
+
+Another unique feature of Dauqu Proxy is its ability to proxy Docker applications to the public. This allows for easy and secure access to applications running within a Docker container, without the need for additional configuration or setup. This can be especially useful for developers and organizations that use Docker as a part of their workflow.
+
+Overall, Dauqu Proxy is a versatile and powerful option for hosting and managing web applications, with features that make it a valuable alternative to nginx. It is easy to use and maintain, which makes it accessible to developers of all skill levels.
 
 
 
