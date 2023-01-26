@@ -14,7 +14,7 @@ Dauqu Proxy is an open-source program written in Go that serves as an alternativ
 Dauqu Proxy is easy to use and maintain, making it accessible to developers of all skill levels. It is an ideal choice for hosting and managing web applications, with features that make it a valuable alternative to nginx.
 
 ## Try it out
-Want to give Dauqu Proxy a try? Head over to the [repository](https://github.com/dauqu/Dauqu-Proxy) and follow the instructions in the README to get started.
+Want to give Dauqu Proxy a try? Head over to the [repository](https://github.com/dauqu/dauqu-proxy) and follow the instructions in the README to get started.
 
 ## Contribute
-We welcome contributions to the Dauqu Proxy project. If you're interested in contributing, head over to the [contributing guidelines](https://github.com/dauqu/Dauqu-Proxy/blob/master/CONTRIBUTING.md) for more information.
+We welcome contributions to the Dauqu Proxy project. If you're interested in contributing, head over to the [contributing guidelines](https://github.com/dauqu/dauqu-proxy/blob/master/CONTRIBUTING.md) for more information.
