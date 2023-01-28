@@ -2,8 +2,8 @@ package main
 
 import (
 	"crypto/tls"
-	database "dauqu-server/config"
 	actions "dauqu-server/actions"
+	database "dauqu-server/config"
 	"fmt"
 	"golang.org/x/crypto/acme/autocert"
 	"net/http"
@@ -106,7 +106,7 @@ func main() {
 					w.Header().Set("Content-Type", "text/html; charset=utf-8")
 					w.WriteHeader(http.StatusServiceUnavailable)
 					//Show html file
-					http.ServeFile(w, r, "/var/dauqu/server/index.html")
+					http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
 				} else {
 					go func() {
 						actions.Counter(r)
@@ -175,7 +175,7 @@ func main() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusServiceUnavailable)
 			//Show html file
-			http.ServeFile(w, r, "/var/dauqu/server/index.html")
+			http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
 		} else {
 			proxy.ServeHTTP(w, r)
 		}
