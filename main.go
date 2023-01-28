@@ -29,6 +29,12 @@ func main() {
 	//Get domain from database
 	db := database.Connect()
 
+	//Create table if not exists
+	_, err = db.Query("CREATE TABLE IF NOT EXISTS proxies (domain VARCHAR(255) NOT NULL, proxy VARCHAR(255) NOT NULL, PRIMARY KEY (domain))")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	//Get all proxies
 	rows, err := db.Query("SELECT * FROM proxies")
 	if err != nil {
