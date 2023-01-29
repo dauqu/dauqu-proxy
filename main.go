@@ -202,6 +202,6 @@ func main() {
 	}
 
 	//Listen and serve http and https
-	go http.ListenAndServe(":80", mux)
+	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 	server.ListenAndServeTLS("", "")
 }

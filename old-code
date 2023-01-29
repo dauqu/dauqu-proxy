@@ -192,9 +192,11 @@ func main() {
 		Handler: mux,
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
+			// tlsConfig := cfg.TLSConfig() 
+ 			// tlsConfig.NextProtos = append([]string{"h2", "http/1.1"}, tlsConfig.NextProtos...) 
 		},
 	}
 
-	go http.ListenAndServe(":80", mux)
+	 go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 	server.ListenAndServeTLS("", "")
 }
