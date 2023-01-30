@@ -40,6 +40,8 @@ func main() {
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
 
+			fmt.Println("Domain: " + domain.Domain + " Proxy: " + domain.Proxy)
+
 			vhost, err := url.Parse(domain.Proxy)
 			if err != nil {
 				fmt.Println(err)
@@ -78,22 +80,11 @@ func main() {
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//Check if proxy is responding or not
+
 				go func() {
-					_, err := http.Get(domain.Proxy)
-					if err != nil {
-						//Return html error
-						w.Header().Set("Content-Type", "text/html; charset=utf-8")
-						w.WriteHeader(http.StatusServiceUnavailable)
-						//Show html file
-						http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
-					} else {
-						go func() {
-							actions.Counter(r)
-						}()
-						proxy.ServeHTTP(w, r)
-					}
+					actions.Counter(r)
 				}()
+				proxy.ServeHTTP(w, r)
 			})
 		}
 	}
@@ -151,20 +142,18 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		go func() {
-			//Check if proxy is responding or not
-			_, err := http.Get("http://localhost:9000")
-			if err != nil {
-				//Return html error
-				w.Header().Set("Content-Type", "text/html; charset=utf-8")
-				w.WriteHeader(http.StatusServiceUnavailable)
-				//Show html file
-				http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
-			} else {
 
-				proxy.ServeHTTP(w, r)
-			}
-		}()
+		//Check if proxy is responding or not
+		_, err := http.Get("http://localhost:9000")
+		if err != nil {
+			//Return html error
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.WriteHeader(http.StatusServiceUnavailable)
+			//Show html file
+			http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
+		} else {
+			proxy.ServeHTTP(w, r)
+		}
 	})
 
 	//Cert Manager for auto generate ssl
