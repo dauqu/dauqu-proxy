@@ -10,15 +10,15 @@ import (
 func Connect() *sql.DB {
 	db, err := sql.Open("mysql", "dauqu:7388139606@tcp(localhost:3306)/dauqu")
 	if err != nil {
-		fmt.Println(err)
+		return nil
 	}
 
 	// Test the connection
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
+		return nil
 	} else {
-		fmt.Println("Connected to MySQL!")
+		fmt.Println("Connected to database")
 	}
 	return db
 }
@@ -27,5 +27,3 @@ func Connect() *sql.DB {
 func Close(db *sql.DB) {
 	db.Close()
 }
-
-	
