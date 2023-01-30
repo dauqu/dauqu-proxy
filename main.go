@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/tls"
-	actions "dauqu-server/actions"
+	// actions "dauqu-server/actions"
 	database "dauqu-server/config"
 	"fmt"
 	"golang.org/x/crypto/acme/autocert"
@@ -105,20 +105,20 @@ func main() {
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-				//Check if proxy is responding or not
-				_, err := http.Get(domain.Proxy)
-				if err != nil {
-					//Return html error
-					w.Header().Set("Content-Type", "text/html; charset=utf-8")
-					w.WriteHeader(http.StatusServiceUnavailable)
-					//Show html file
-					http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
-				} else {
-					go func() {
-						actions.Counter(r)
-					}()
+				// //Check if proxy is responding or not
+				// _, err := http.Get(domain.Proxy)
+				// if err != nil {
+				// 	//Return html error
+				// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				// 	w.WriteHeader(http.StatusServiceUnavailable)
+				// 	//Show html file
+				// 	http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
+				// } else {
+				// 	go func() {
+				// 		actions.Counter(r)
+				// 	}()
 					proxy.ServeHTTP(w, r)
-				}
+				// }
 			})
 		}
 	}
