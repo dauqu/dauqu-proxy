@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/tls"
-	// actions "dauqu-server/actions"
+	actions "dauqu-server/actions"
 	database "dauqu-server/config"
 	"fmt"
 	"golang.org/x/crypto/acme/autocert"
@@ -114,9 +114,9 @@ func main() {
 				// 	//Show html file
 				// 	http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
 				// } else {
-				// 	go func() {
-				// 		actions.Counter(r)
-				// 	}()
+					go func() {
+						actions.Counter(r)
+					}()
 					proxy.ServeHTTP(w, r)
 				// }
 			})
