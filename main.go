@@ -27,6 +27,8 @@ func main() {
 		fmt.Println(err)
 	}
 
+	fmt.Println(len(dauqu))
+
 	//Loop through domains
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
@@ -135,37 +137,27 @@ func main() {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusServiceUnavailable)
 			//Show html file
-			http.ServeFile(w, r, "/var/dauqu/dauqu-proxy/index.html")
+			http.ServeFile(w, r, "/var/dauqu/server/index.html")
 		} else {
 			proxy.ServeHTTP(w, r)
 		}
 	})
 
-	//API SERVER
-	// mux.HandleFunc(hostname+"/dauqu-proxy/activity", apis.AllActivity)
-	// mux.HandleFunc(hostname+"/dauqu-proxy/analytics", apis.Analytics)
-	// mux.HandleFunc(hostname+"/dauqu-proxy/anaytics-by-host", apis.AnalyticsByHostname)
-	//Get method for websocket
-	// go mux.HandleFunc(hostname+"/dauqu-proxy/ws", actions.WebSocket)
-
-
-
-
-	//Cert Manager for auto generate ssl
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
 		Cache:  autocert.DirCache("/var/dauqu/cert"),
 	}
-	//Create server
+
 	server := &http.Server{
-		Handler: mux,
 		Addr:    ":443",
+		Handler: mux,
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
+			// tlsConfig := cfg.TLSConfig() 
+ 			// tlsConfig.NextProtos = append([]string{"h2", "http/1.1"}, tlsConfig.NextProtos...) 
 		},
 	}
 
-	//Listen and serve http and https
-	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	 go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 	server.ListenAndServeTLS("", "")
 }
