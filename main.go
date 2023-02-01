@@ -9,6 +9,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -42,7 +43,9 @@ func main() {
 				Host:   vhost.Host,
 			})
 
-			var host_proxy = domain.Proxy
+			var host_proxy = vhost.Host
+			//Splite left side of : to get host
+			port := strings.Replace(host_proxy, "localhost:", "", 1)
 
 			//Set Header
 			proxy.Director = func(req *http.Request) {
@@ -71,7 +74,7 @@ func main() {
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				go func() {
-					actions.Counter(r, host_proxy)
+					actions.Counter(r, port)
 				}()
 				proxy.ServeHTTP(w, r)
 			})
@@ -145,10 +148,9 @@ func main() {
 	//API function
 	mux.HandleFunc(hostname+"/dp/all-activity/", apis.AllActivity)
 	mux.HandleFunc(hostname+"/dp/analytics/", apis.Analytics)
-	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByHostname)
-	//WebSocket 
+	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByPort)
+	//WebSocket
 	mux.HandleFunc(hostname+"/dp/ws/", actions.WsHandler)
-
 
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,

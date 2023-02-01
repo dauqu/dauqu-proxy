@@ -89,13 +89,13 @@ func Analytics(w http.ResponseWriter, r *http.Request) {
 }
 
 // analytics by hostname
-func AnalyticsByHostname(w http.ResponseWriter, r *http.Request) {
-	type Hostname struct {
-		Hostname string `json:"hostname"`
+func AnalyticsByPort(w http.ResponseWriter, r *http.Request) {
+	type Body struct {
+		Port string `json:"port"`
 	}
 
-	var hostname Hostname
-	err := json.NewDecoder(r.Body).Decode(&hostname)
+	var port Body
+	err := json.NewDecoder(r.Body).Decode(&port)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -104,21 +104,21 @@ func AnalyticsByHostname(w http.ResponseWriter, r *http.Request) {
 
 	var total_requests int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE hostname = ?", hostname.Hostname).Scan(&total_requests)
+	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE port = ?", port.Port).Scan(&total_requests)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	var unique_visitors int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(DISTINCT ip) FROM counter WHERE hostname = ?", hostname.Hostname).Scan(&unique_visitors)
+	err = db.QueryRow("SELECT COUNT(DISTINCT ip) FROM counter WHERE port = ?", port.Port).Scan(&unique_visitors)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	var hours_24 int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE time > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND hostname = ?", hostname.Hostname).Scan(&hours_24)
+	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE time > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND port = ?", port.Port).Scan(&hours_24)
 	if err != nil {
 		fmt.Println(err)
 	}
