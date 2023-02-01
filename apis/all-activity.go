@@ -11,7 +11,7 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 	db := database.Connect()
 
 	//Get all proxies and return them
-	rows, err := db.Query("SELECT ip, hostname, method, time FROM counter")
+	rows, err := db.Query("SELECT * FROM counter")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -19,9 +19,10 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 	//Check database have 0 rows
 
 	type Counter struct {
+		Id       int    `json:"id"`
 		Ip       string `json:"ip"`
-		Port     string `json:"port"`
 		Hostname string `json:"hostname"`
+		Port     string `json:"port"`
 		Method   string `json:"method"`
 		Time     string `json:"time"`
 	}
@@ -30,18 +31,19 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 	var dauqu []Counter
 
 	for rows.Next() {
+		var id int
 		var ip string
-		var port string
 		var hostname string
+		var port string
 		var method string
 		var time string
 
-		err = rows.Scan(&ip, &port, &hostname, &method, &time)
+		err = rows.Scan(&id, &ip, &hostname, &port, &method, &time)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		dauqu = append(dauqu, Counter{Ip: ip, Port: port, Hostname: hostname, Method: method, Time: time})
+		dauqu = append(dauqu, Counter{Id: id, Ip: ip, Hostname: hostname, Port: port, Method: method, Time: time})
 	}
 
 	defer database.Close(db)
