@@ -27,8 +27,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(len(dauqu))
-
 	//Loop through domains
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
@@ -43,6 +41,8 @@ func main() {
 				Scheme: vhost.Scheme,
 				Host:   vhost.Host,
 			})
+
+			var host_proxy = domain.Proxy
 
 			//Set Header
 			proxy.Director = func(req *http.Request) {
@@ -71,7 +71,7 @@ func main() {
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
 				go func() {
-					actions.Counter(r, w)
+					actions.Counter(r, host_proxy)
 				}()
 				proxy.ServeHTTP(w, r)
 			})

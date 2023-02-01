@@ -30,11 +30,10 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create function that can accept request and response
-func Counter(r *http.Request, w http.ResponseWriter) {
+func Counter(r *http.Request, host_proxy string) {
 
-	//Print response host
-	fmt.Println(w.Header().Get("Host"))
-
+	fmt.Println(host_proxy)
+	
 	//Connect to database
 	db := database.Connect()
 
