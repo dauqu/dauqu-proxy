@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"context"
 	database "dauqu-server/config"
 	"fmt"
 	"net/http"
@@ -10,25 +9,28 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-// Create function that can accept request and response
-func Counter(r *http.Request) {
+var clients = make(map[*websocket.Conn]bool)
+var conn *websocket.Conn
 
-	// Get the websocket connection from the request context
-	conn, _ := r.Context().Value("conn").(*websocket.Conn)
-
-	// Send a message to the Ws function
-	err := conn.WriteJSON("counter hit")
+func WebSocket(w http.ResponseWriter, r *http.Request) {
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	// register client
+	clients[ws] = true
+	conn = ws // Set the global connection
+}
+
+// Create function that can accept request and response
+func Counter(r *http.Request) {
+	//Connect to database
 	db := database.Connect()
 
 	//Get IP address
@@ -44,20 +46,10 @@ func Counter(r *http.Request) {
 
 	//Close database connection
 	database.Close(db)
-}
 
-func Ws(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println(err)
+	//Send data to websocket
+	if conn != nil {
+		conn.WriteJSON(ip)
 	}
-
-	// Create a context with the connection
-	ctx := context.WithValue(r.Context(), "conn", conn)
-
-	// Call the counter function
-	Counter(r.WithContext(ctx))
-
-
 
 }

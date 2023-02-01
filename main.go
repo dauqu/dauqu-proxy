@@ -146,7 +146,7 @@ func main() {
 	mux.HandleFunc(hostname+"/dauqu-proxy/analytics", apis.Analytics)
 	mux.HandleFunc(hostname+"/dauqu-proxy/anaytics-by-host", apis.AnalyticsByHostname)
 	//Websocket
-	mux.HandleFunc(hostname+"/dauqu-proxy/ws", actions.Ws)
+	mux.HandleFunc(hostname+"/dauqu-proxy/ws", actions.WebSocket)
 
 
 
