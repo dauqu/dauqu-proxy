@@ -11,7 +11,7 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 	db := database.Connect()
 
 	//Get all proxies and return them
-	rows, err := db.Query("SELECT * FROM counters")
+	rows, err := db.Query("SELECT * FROM counter")
 	if err != nil {
 		fmt.Println(err)
 	}
