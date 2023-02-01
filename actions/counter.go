@@ -9,6 +9,7 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
+	//Allow all origins
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -49,7 +50,7 @@ func Counter(r *http.Request) {
 
 	//Send data to websocket
 	if conn != nil {
-		conn.WriteJSON(ip)
+		conn.WriteJSON(map[string]string{"ip": ip, "hostname": hostname, "method": method})
 	}
 
 }

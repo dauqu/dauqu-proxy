@@ -148,7 +148,7 @@ func main() {
 	mux.HandleFunc(hostname+"/dp/analytics/", apis.Analytics)
 	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByHostname)
 	//WebSocket 
-
+	mux.HandleFunc(hostname+"/dp/ws/", actions.WsHandler)
 
 
 	certManager := autocert.Manager{
