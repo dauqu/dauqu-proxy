@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/tls"
 	actions "dauqu-server/actions"
-	// "dauqu-server/apis"
+	"dauqu-server/apis"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
@@ -143,6 +143,14 @@ func main() {
 		}
 	})
 
+	//API function
+	mux.HandleFunc(hostname+"/dp/all-activity/", apis.AllActivity)
+	mux.HandleFunc(hostname+"/dp/analytics/", apis.Analytics)
+	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByHostname)
+	//WebSocket 
+
+
+
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
 		Cache:  autocert.DirCache("/var/dauqu/cert"),
@@ -153,11 +161,9 @@ func main() {
 		Handler: mux,
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
-			// tlsConfig := cfg.TLSConfig() 
- 			// tlsConfig.NextProtos = append([]string{"h2", "http/1.1"}, tlsConfig.NextProtos...) 
 		},
 	}
 
-	 go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 	server.ListenAndServeTLS("", "")
 }
