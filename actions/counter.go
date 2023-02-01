@@ -3,6 +3,7 @@ package actions
 import (
 	database "dauqu-server/config"
 	"net/http"
+	"strings"
 )
 
 // Create function that can accept request and response
@@ -11,7 +12,10 @@ func Counter(r *http.Request) {
 	db := database.Connect()
 
 	//Get IP address
-	ip := r.RemoteAddr
+	ip_port := r.RemoteAddr
+
+	ip := strings.Split(ip_port, ":")[0]
+
 	hostname := r.Host
 	method := r.Method
 

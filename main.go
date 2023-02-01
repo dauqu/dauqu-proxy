@@ -15,7 +15,6 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	mux2 := http.NewServeMux()
 
 	//Get Hostname
 	hostname, err := os.Hostname()
@@ -31,9 +30,6 @@ func main() {
 	//Loop through domains
 	if len(dauqu) > 0 {
 		for _, domain := range dauqu {
-
-			fmt.Println("Domain: " + domain.Domain + " Proxy: " + domain.Proxy)
-
 			vhost, err := url.Parse(domain.Proxy)
 			if err != nil {
 				fmt.Println(err)
@@ -145,9 +141,12 @@ func main() {
 		}
 	})
 
+	//API SERVER
+	mux.HandleFunc(hostname+"/dauqu-proxy/activity", apis.AllActivity)
+	mux.HandleFunc(hostname+"/dauqu-proxy/analytics", apis.Analytics)
+	mux.HandleFunc(hostname+"/dauqu-proxy/anaytics-by-host", apis.AnalyticsByHostname)
 
-	//API SERVER 
-	mux2.HandleFunc("/", apis.AllActivity)
+
 
 	//Cert Manager for auto generate ssl
 	certManager := autocert.Manager{
@@ -165,6 +164,5 @@ func main() {
 
 	//Listen and serve http and https
 	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
-	go http.ListenAndServe(":8000", mux2)
 	server.ListenAndServeTLS("", "")
 }
