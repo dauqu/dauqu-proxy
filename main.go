@@ -70,9 +70,8 @@ func main() {
 			}
 
 			mux.HandleFunc(domain.Domain+"/", func(w http.ResponseWriter, r *http.Request) {
-
 				go func() {
-					actions.Counter(r)
+					actions.Counter(r, w)
 				}()
 				proxy.ServeHTTP(w, r)
 			})
