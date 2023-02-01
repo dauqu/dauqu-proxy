@@ -20,7 +20,6 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 		Ip      string `json:"ip"`
 		Hostname string `json:"hostname"`
 		Method  string `json:"method"`
-		Time    string `json:"time"`
 	}
 
 	//Create array of domains
@@ -31,14 +30,13 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 			var ip string
 			var hostname string
 			var method string
-			var time string
 
-			err = rows.Scan(&ip, &hostname, &method, &time)
+			err = rows.Scan(&ip, &hostname, &method)
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			dauqu = append(dauqu, Counter{Ip: ip, Hostname: hostname, Method: method, Time: time})
+			dauqu = append(dauqu, Counter{Ip: ip, Hostname: hostname, Method: method})
 		}
 	}
 
