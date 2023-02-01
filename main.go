@@ -89,9 +89,6 @@ func main() {
 		}
 	}
 
-	//Close database connection
-	database.Close(db)
-
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
 		fmt.Println(err)

@@ -22,16 +22,18 @@ func GetAll() ([]Domains, error) {
 	//Create array of domains
 	var dauqu []Domains
 
-	for rows.Next() {
-		var domain string
-		var proxy string
+	if len(dauqu) > 0 {
+		for rows.Next() {
+			var domain string
+			var proxy string
 
-		err = rows.Scan(&domain, &proxy)
-		if err != nil {
-			fmt.Println(err)
+			err = rows.Scan(&domain, &proxy)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			dauqu = append(dauqu, Domains{Domain: domain, Proxy: proxy})
 		}
-
-		dauqu = append(dauqu, Domains{Domain: domain, Proxy: proxy})
 	}
 
 	defer database.Close(db)

@@ -10,13 +10,13 @@ import (
 func Connect() *sql.DB {
 	db, err := sql.Open("mysql", "dauqu:7388139606@tcp(localhost:3306)/dauqu")
 	if err != nil {
-		return nil
+		fmt.Println(err)
 	}
 
 	// Test the connection
 	err = db.Ping()
 	if err != nil {
-		return nil
+		fmt.Println(err)
 	} else {
 		fmt.Println("Connected to database")
 	}
