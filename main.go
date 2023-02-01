@@ -3,32 +3,24 @@ package main
 import (
 	"crypto/tls"
 	actions "dauqu-server/actions"
-	database "dauqu-server/config"
+	"dauqu-server/apis"
 	"fmt"
-	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	mux := http.NewServeMux()
+	mux2 := http.NewServeMux()
 
 	//Get Hostname
 	hostname, err := os.Hostname()
 	if err != nil {
 		fmt.Println(err)
-	}
-
-	//Get domain from database
-	db := database.Connect()
-
-	//Check database connection is not nil
-	if db != nil {
-		actions.CreateTable()
-	} else {
-		fmt.Println("Failed to connect to database")
 	}
 
 	dauqu, err := actions.GetAll()
@@ -153,6 +145,10 @@ func main() {
 		}
 	})
 
+
+	//API SERVER 
+	mux2.HandleFunc("/", apis.AllActivity)
+
 	//Cert Manager for auto generate ssl
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
@@ -169,5 +165,6 @@ func main() {
 
 	//Listen and serve http and https
 	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	go http.ListenAndServe(":8000", mux2)
 	server.ListenAndServeTLS("", "")
 }

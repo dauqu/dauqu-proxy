@@ -13,6 +13,13 @@ type Domains struct {
 func GetAll() ([]Domains, error) {
 	db := database.Connect()
 
+	//Check database connection is not nil
+	if db != nil {
+		CreateTable()
+	} else {
+		fmt.Println("Failed to connect to database")
+	}
+
 	//Get all proxies and return them
 	rows, err := db.Query("SELECT * FROM proxies")
 	if err != nil {
