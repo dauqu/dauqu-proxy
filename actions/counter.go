@@ -2,7 +2,7 @@ package actions
 
 import (
 	database "dauqu-server/config"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"strings"
 	"github.com/gorilla/websocket"
@@ -14,19 +14,19 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var clients = make(map[*websocket.Conn]bool)
-var conn *websocket.Conn
+// var clients = make(map[*websocket.Conn]bool)
+// var conn *websocket.Conn
 
-func WebSocket(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println(err)
-	}
+// func WebSocket(w http.ResponseWriter, r *http.Request) {
+// 	ws, err := upgrader.Upgrade(w, r, nil)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
 
-	// register client
-	clients[ws] = true
-	conn = ws // Set the global connection
-}
+// 	// register client
+// 	clients[ws] = true
+// 	conn = ws // Set the global connection
+// }
 
 // Create function that can accept request and response
 func Counter(r *http.Request) {
@@ -48,8 +48,8 @@ func Counter(r *http.Request) {
 	database.Close(db)
 
 	//Send data to websocket
-	if conn != nil {
-		conn.WriteJSON(ip)
-	}
+	// if conn != nil {
+	// 	conn.WriteJSON(ip)
+	// }
 
 }
