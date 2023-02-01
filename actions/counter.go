@@ -5,14 +5,14 @@ import (
 	// "fmt"
 	"net/http"
 	"strings"
-	"github.com/gorilla/websocket"
+	// "github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
+// var upgrader = websocket.Upgrader{
+// 	CheckOrigin: func(r *http.Request) bool {
+// 		return true
+// 	},
+// }
 
 // var clients = make(map[*websocket.Conn]bool)
 // var conn *websocket.Conn
