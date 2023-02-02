@@ -25,9 +25,8 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	// register client
 	clients[ws] = true
-	conn = ws // Set the global connection
+	conn = ws
 }
 
 // Create function that can accept request and response
