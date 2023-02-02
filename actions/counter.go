@@ -19,13 +19,6 @@ var clients = make(map[*websocket.Conn]bool)
 var conn *websocket.Conn
 
 func WsHandler(w http.ResponseWriter, r *http.Request) {
-
-	allowedOrigins := []string{"https://www.piesocket.com", "https://host.dauqu.com"}
-
-	w.Header().Set("Access-Control-Allow-Origin", allowedOrigins[0])
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println(err)
