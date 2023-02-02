@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-
 var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -19,6 +20,17 @@ var clients = make(map[*websocket.Conn]bool)
 var conn *websocket.Conn
 
 func WsHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Allow connections only from specified origins
+	allowedOrigins := []string{"https://host.dauqu.com", "https://www.piesocket.com"}
+	origin := r.Header.Get("Origin")
+	for _, allowed := range allowedOrigins {
+		if origin == allowed {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			break
+		}
+	}
+
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println(err)
