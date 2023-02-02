@@ -165,6 +165,6 @@ func main() {
 		},
 	}
 
-	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	go http.ListenAndServe(":80", certManager.HTTPHandler(mux))
 	server.ListenAndServeTLS("", "")
 }
