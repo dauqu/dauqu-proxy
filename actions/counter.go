@@ -8,12 +8,7 @@ import (
 	"strings"
 )
 
-var upgrader = websocket.Upgrader{
-	//Allow all origins
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
+var upgrader = websocket.Upgrader{}
 
 var clients = make(map[*websocket.Conn]bool)
 var conn *websocket.Conn
