@@ -81,6 +81,13 @@ func main() {
 		}
 	}
 
+	//API function
+	mux.HandleFunc(hostname+"/dp/all-activity/", apis.AllActivity)
+	mux.HandleFunc(hostname+"/dp/analytics/", apis.Analytics)
+	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByPort)
+	//WebSocket
+	mux.HandleFunc(hostname+"/dp/ws/", actions.WsHandler)
+
 	vhost, err := url.Parse("http://localhost:9000")
 	if err != nil {
 		fmt.Println(err)
@@ -144,13 +151,6 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		}
 	})
-
-	//API function
-	mux.HandleFunc(hostname+"/dp/all-activity/", apis.AllActivity)
-	mux.HandleFunc(hostname+"/dp/analytics/", apis.Analytics)
-	mux.HandleFunc(hostname+"/dp/analytics-by-hostname/", apis.AnalyticsByPort)
-	//WebSocket
-	mux.HandleFunc(hostname+"/dp/ws/", actions.WsHandler)
 
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
