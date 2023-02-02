@@ -159,7 +159,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":443",
-		Handler: mux,
+		Handler: originMiddleware(mux),
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
 		},
@@ -167,4 +167,28 @@ func main() {
 
 	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 	server.ListenAndServeTLS("", "")
+}
+
+
+var allowedOrigins = []string{"https://host.dauqu.com", "https://www.piesocket.com"}
+
+func originMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		found := false
+		for _, allowed := range allowedOrigins {
+			if origin == allowed {
+				found = true
+				break
+			}
+		}
+		if !found {
+			http.Error(w, "Origin not allowed", http.StatusForbidden)
+			return
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		next.ServeHTTP(w, r)
+	})
 }

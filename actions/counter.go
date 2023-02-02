@@ -8,11 +8,10 @@ import (
 	"strings"
 )
 
+
 var upgrader = websocket.Upgrader{
-	//Allow all origins
 	CheckOrigin: func(r *http.Request) bool {
-		origin := r.Header.Get("Origin")
-		return origin == "https://host.dauqu.com"
+		return true
 	},
 }
 
