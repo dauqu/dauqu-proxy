@@ -11,7 +11,8 @@ import (
 var upgrader = websocket.Upgrader{
 	//Allow all origins
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		origin := r.Header.Get("Origin")
+		return origin == "https://host.dauqu.com"
 	},
 }
 
