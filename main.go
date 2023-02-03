@@ -4,15 +4,20 @@ import (
 	"crypto/tls"
 	actions "dauqu-server/actions"
 	"dauqu-server/apis"
+	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"strings"
-
-	"golang.org/x/crypto/acme/autocert"
 )
+
+type Domains struct {
+	Domain string `json:"domain"`
+	Proxy  string `json:"proxy"`
+}
 
 func main() {
 	mux := http.NewServeMux()
@@ -23,7 +28,39 @@ func main() {
 		fmt.Println(err)
 	}
 
-	dauqu, err := actions.GetAll()
+	// dauqu, err := actions.GetAll()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
+	actions.RefreshData()
+
+	// 	//Read JSON file
+	jsonFile, err := os.ReadFile("/var/dauqu/dauqu.json")
+	if err != nil {
+		//If file not found create new file
+		if os.IsNotExist(err) {
+			_, err = os.Create("/var/dauqu/dauqu.json")
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			//Write to file
+			err = os.WriteFile("/var/dauqu/dauqu.json", []byte("[]"), 0644)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			fmt.Println(err)
+		}
+	}
+
+	fmt.Println("Successfully Opened dauqu.json")
+
+	var dauqu []Domains
+
+	// 	//Unmarshal JSON file
+	err = json.Unmarshal(jsonFile, &dauqu)
 	if err != nil {
 		fmt.Println(err)
 	}
