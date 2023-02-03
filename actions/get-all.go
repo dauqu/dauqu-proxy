@@ -43,7 +43,5 @@ func GetAll() ([]Domains, error) {
 
 	defer database.Close(db)
 
-	//Append data in JSON file 
-
 	return dauqu, nil
 }
