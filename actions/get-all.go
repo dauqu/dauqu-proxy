@@ -2,11 +2,11 @@ package actions
 
 import (
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
 )
 
+// Return rows as JSON
 type Domains struct {
 	Domain string `json:"domain"`
 	Proxy  string `json:"proxy"`
@@ -19,32 +19,18 @@ func GetAll() ([]Domains, error) {
 	//Get all proxies
 	cursor, err := ProxyCollection.Find(ctx, bson.M{})
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
-	//Create array of proxies
-	var proxies []bson.M
-
-	//Loop through all proxies
-	for cursor.Next(ctx) {
-		var proxy bson.M
-		err = cursor.Decode(&proxy)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		proxies = append(proxies, proxy)
-	}
-
-	//Create array of domains
+	//Bind rows to array
 	var domains []Domains
 
-	//Loop through all proxies
-	for _, proxy := range proxies {
-		domain := Domains{
-			Domain: proxy["domain"].(string),
-			Proxy:  proxy["proxy"].(string),
+	//Loop through all rows
+	for cursor.Next(ctx) {
+		var domain Domains
+		err = cursor.Decode(&domain)
+		if err != nil {
+			return nil, err
 		}
 
 		domains = append(domains, domain)
