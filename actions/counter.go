@@ -33,7 +33,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	conn = ws
 }
 
-var ProxyCollection *mongo.Collection = config.GetCollection(config.DB, "counter")
+var CounterCollection *mongo.Collection = config.GetCollection(config.DB, "counter")
 
 // Create function that can accept request and response
 func Counter(r *http.Request, port_number string) {
@@ -51,7 +51,7 @@ func Counter(r *http.Request, port_number string) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	//Insert data to database
-	_, err := ProxyCollection.InsertOne(ctx, bson.M{"ip": ip, "hostname": hostname, "port": port_number, "method": method})
+	_, err := CounterCollection.InsertOne(ctx, bson.M{"ip": ip, "hostname": hostname, "port": port_number, "method": method})
 	if err != nil {
 		fmt.Println(err)
 	}
