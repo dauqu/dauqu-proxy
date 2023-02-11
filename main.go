@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"os"
 	"strings"
-
 	"golang.org/x/crypto/acme/autocert"
 )
 
