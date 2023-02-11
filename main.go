@@ -37,6 +37,8 @@ func main() {
 		fmt.Println(err)
 	}
 
+	fmt.Println(dauqu)
+
 	actions.RefreshData()
 
 	// 	//Read JSON file
