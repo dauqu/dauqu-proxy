@@ -2,35 +2,12 @@ package config
 
 import (
 	"context"
-	// "database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
-
-// Connect to MySQL database and return a pointer to sql.DB
-// func Connect() *sql.DB {
-// 	db, err := sql.Open("mysql", "dauqu:7388139606@tcp(localhost:27017)/dauqu")
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-
-// 	// Test the connection
-// 	err = db.Ping()
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	} else {
-// 		fmt.Println("Connected to database")
-// 	}
-// 	return db
-// }
-
-// Close the database connection
-// func Close(db *sql.DB) {
-// 	db.Close()
-// }
 
 // MongoDb
 func ConnectDB() *mongo.Client {
