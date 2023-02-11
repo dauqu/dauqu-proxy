@@ -7,12 +7,12 @@ import (
 	database "dauqu-server/config"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"strings"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 type Domains struct {
@@ -23,7 +23,7 @@ type Domains struct {
 func main() {
 	mux := http.NewServeMux()
 
-	//MongoDb 
+	//MongoDb
 	database.ConnectDB()
 
 	//Get Hostname
@@ -32,10 +32,10 @@ func main() {
 		fmt.Println(err)
 	}
 
-	// dauqu, err := actions.GetAll()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	dauqu, err := actions.GetAll()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	actions.RefreshData()
 
@@ -61,7 +61,7 @@ func main() {
 
 	fmt.Println("Successfully Opened dauqu.json")
 
-	var dauqu []Domains
+	// var dauqu []Domains
 
 	// 	//Unmarshal JSON file
 	err = json.Unmarshal(jsonFile, &dauqu)
