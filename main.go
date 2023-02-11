@@ -105,7 +105,8 @@ func main() {
 				resp.Header.Set("Content-Security-Policy", "upgrade-insecure-requests")
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
-				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+				//Set content type
+				resp.Header.Set("Content-Type", "text/html; charset=utf-8")
 				return nil
 			}
 
