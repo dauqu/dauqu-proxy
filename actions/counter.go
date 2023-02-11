@@ -1,11 +1,15 @@
 package actions
 
 import (
-	database "dauqu-server/config"
+	"context"
+	"dauqu-server/config"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"strings"
+	"time"
+	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var upgrader = websocket.Upgrader{
@@ -29,11 +33,10 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	conn = ws
 }
 
+var ProxyCollection *mongo.Collection = config.GetCollection(config.DB, "counter")
+
 // Create function that can accept request and response
 func Counter(r *http.Request, port_number string) {
-
-	//Connect to database
-	db := database.Connect()
 
 	//Get IP address
 	ip_port := r.RemoteAddr
@@ -41,13 +44,17 @@ func Counter(r *http.Request, port_number string) {
 	hostname := r.Host
 	method := r.Method
 
-	//Create table if not exist
-	db.Exec("CREATE TABLE IF NOT EXISTS `counter` (`id` int(11) NOT NULL AUTO_INCREMENT,`ip` varchar(255) NOT NULL,`hostname` varchar(255) NOT NULL,`port` varchar(255) NOT NULL,`method` varchar(255) NOT NULL,`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;")
 	//Insert data to database
-	db.Exec("INSERT INTO counter (ip, hostname, port, method) VALUES (?, ?, ?, ?)", ip, hostname, port_number, method)
+	// db.Exec("INSERT INTO counter (ip, hostname, port, method) VALUES (?, ?, ?, ?)", ip, hostname, port_number, method)
 
-	//Close database connection
-	database.Close(db)
+	//Create context
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	//Insert data to database
+	_, err := ProxyCollection.InsertOne(ctx, bson.M{"ip": ip, "hostname": hostname, "port": port_number, "method": method})
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Send data to websocket
 	if conn != nil {

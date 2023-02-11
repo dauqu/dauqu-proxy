@@ -1,25 +1,40 @@
 package apis
 
 import (
-	database "dauqu-server/config"
+	"context"
+	"dauqu-server/config"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var ProxyCollection *mongo.Collection = config.GetCollection(config.DB, "counter")
+
 func AllActivity(w http.ResponseWriter, r *http.Request) {
-	db := database.Connect()
+
+	//Create context
+	ctx, _ := context.WithTimeout(context.Background(), 600*time.Second)
 
 	//Get all proxies and return them
-	rows, err := db.Query("SELECT * FROM counter")
+	cursor, err := ProxyCollection.Find(ctx, bson.M{})
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	//Check database have 0 rows
+	//Get all proxies and return them
+	var results []bson.M
 
+	if err = cursor.All(ctx, &results); err != nil {
+		fmt.Println(err)
+	}
+
+	//Return all JSOn
 	type Counter struct {
-		Id       int    `json:"id"`
+		Id       string `json:"id"`
 		Ip       string `json:"ip"`
 		Hostname string `json:"hostname"`
 		Port     string `json:"port"`
@@ -27,53 +42,43 @@ func AllActivity(w http.ResponseWriter, r *http.Request) {
 		Time     string `json:"time"`
 	}
 
-	//Create array of domains
-	var dauqu []Counter
+	var counters []Counter
 
-	for rows.Next() {
-		var id int
-		var ip string
-		var hostname string
-		var port string
-		var method string
-		var time string
-
-		err = rows.Scan(&id, &ip, &hostname, &port, &method, &time)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		dauqu = append(dauqu, Counter{Id: id, Ip: ip, Hostname: hostname, Port: port, Method: method, Time: time})
+	for _, result := range results {
+		counters = append(counters, Counter{
+			Id:       result["_id"].(string),
+			Ip:       result["ip"].(string),
+			Hostname: result["hostname"].(string),
+			Port:     result["port"].(string),
+			Method:   result["method"].(string),
+			Time:     result["time"].(string),
+		})
 	}
-
-	defer database.Close(db)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(dauqu)
-
+	json.NewEncoder(w).Encode(counters)
 }
 
 func Analytics(w http.ResponseWriter, r *http.Request) {
-	db := database.Connect()
 
-	var total_requests int
-	//Get all proxies and return them
-	err := db.QueryRow("SELECT COUNT(*) FROM counter").Scan(&total_requests)
+	//Create context
+	ctx, _ := context.WithTimeout(context.Background(), 600*time.Second)
+
+	//GEt length of all proxies
+	total_requests, err := ProxyCollection.CountDocuments(ctx, bson.D{})
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var unique_visitors int
-	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(DISTINCT ip) FROM counter").Scan(&unique_visitors)
+	//Get unique visitors
+	unique_visitors, err := ProxyCollection.Distinct(ctx, "ip", bson.D{})
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var hours_24 int
-	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE time > DATE_SUB(NOW(), INTERVAL 24 HOUR)").Scan(&hours_24)
+	//Get 24 hours
+	hours_24, err := ProxyCollection.CountDocuments(ctx, bson.M{"time": bson.M{"$gt": time.Now().Add(-24 * time.Hour)}})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -85,11 +90,13 @@ func Analytics(w http.ResponseWriter, r *http.Request) {
 		Last24Hours    int `json:"last_24_hours"`
 	}
 
-	defer database.Close(db)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(Total{TotalRequests: total_requests, UniqueVisitors: unique_visitors, Last24Hours: hours_24})
+	json.NewEncoder(w).Encode(Total{
+		TotalRequests:  int(total_requests),
+		UniqueVisitors: len(unique_visitors),
+		Last24Hours:    int(hours_24),
+	})
 }
 
 // analytics by hostname
@@ -104,25 +111,23 @@ func AnalyticsByPort(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	db := database.Connect()
+	//Create context
+	ctx, _ := context.WithTimeout(context.Background(), 600*time.Second)
 
-	var total_requests int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE port = ?", port.Port).Scan(&total_requests)
+	total_requests, err := ProxyCollection.CountDocuments(ctx, bson.M{"port": port.Port})
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var unique_visitors int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(DISTINCT ip) FROM counter WHERE port = ?", port.Port).Scan(&unique_visitors)
+	unique_visitors, err := ProxyCollection.Distinct(ctx, "ip", bson.M{"port": port.Port})
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	var hours_24 int
 	//Get all proxies and return them
-	err = db.QueryRow("SELECT COUNT(*) FROM counter WHERE time > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND port = ?", port.Port).Scan(&hours_24)
+	hours_24, err := ProxyCollection.CountDocuments(ctx, bson.M{"port": port.Port, "time": bson.M{"$gt": time.Now().Add(-24 * time.Hour)}})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -134,9 +139,11 @@ func AnalyticsByPort(w http.ResponseWriter, r *http.Request) {
 		Last24Hours    int `json:"last_24_hours"`
 	}
 
-	defer database.Close(db)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(Total{TotalRequests: total_requests, UniqueVisitors: unique_visitors, Last24Hours: hours_24})
+	json.NewEncoder(w).Encode(Total{
+		TotalRequests:  int(total_requests),
+		UniqueVisitors: len(unique_visitors),
+		Last24Hours:    int(hours_24),
+	})
 }

@@ -4,14 +4,16 @@ import (
 	"crypto/tls"
 	actions "dauqu-server/actions"
 	"dauqu-server/apis"
+	database "dauqu-server/config"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/crypto/acme/autocert"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"strings"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 type Domains struct {
@@ -21,6 +23,9 @@ type Domains struct {
 
 func main() {
 	mux := http.NewServeMux()
+
+	//MongoDb 
+	database.ConnectDB()
 
 	//Get Hostname
 	hostname, err := os.Hostname()
