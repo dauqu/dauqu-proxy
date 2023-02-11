@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
 var ProxyCollection *mongo.Collection = config.GetCollection(config.DB, "proxies")
 
 // Return rows as JSON
