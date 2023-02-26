@@ -95,11 +95,11 @@ func main() {
 				req.URL.Scheme = vhost.Scheme
 				req.URL.Host = vhost.Host
 				req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-				req.Header.Set("X-Forwarded-Proto", req.Header.Get("X-Forwarded-Proto"))
+				req.Header.Set("X-Forwarded-Proto", "https")
 				req.Header.Set("X-Forwarded-For", req.RemoteAddr)
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
-				req.Header.Set("X-Forwarded-Port", req.Header.Get("X-Forwarded-Port"))
-				req.Header.Set("X-Forwarded-SSL", req.Header.Get("X-Forwarded-SSL"))
+				req.Header.Set("X-Forwarded-Port", "443")
+				req.Header.Set("X-Forwarded-SSL", "on")
 			}
 
 			//Header response
@@ -208,6 +208,7 @@ func main() {
 		},
 	}
 
-	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	go http.ListenAndServe(":80", certManager.HTTPHandler(mux))
+
 	server.ListenAndServeTLS("", "")
 }
