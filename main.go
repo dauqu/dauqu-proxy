@@ -112,7 +112,9 @@ func main() {
 				resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 				resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 				//Allow content type to be text/html
-				resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+				resp.Header.Set("Content-Type", "text/html; charset=utf-8")
+				//Content Encoding
+				resp.Header.Set("Content-Encoding", "gzip")
 				return nil
 			}
 
