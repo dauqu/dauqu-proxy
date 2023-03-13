@@ -152,6 +152,8 @@ func main() {
 		req.Header.Set("X-Real-IP", req.RemoteAddr)
 		req.Header.Set("X-Forwarded-Port", "443")
 		req.Header.Set("X-Forwarded-SSL", "on")
+		req.Header.Set("Upgrade", req.Header.Get("Upgrade"))
+		req.Header.Set("Connection", "Upgrade")
 	}
 
 	//Header response
@@ -164,6 +166,9 @@ func main() {
 		resp.Header.Set("Access-Control-Allow-Origin", resp.Header.Get("Access-Control-Allow-Origin"))
 		resp.Header.Set("Access-Control-Allow-Credentials", resp.Header.Get("Access-Control-Allow-Credentials"))
 		resp.Header.Set("Content-Type", resp.Header.Get("Content-Type"))
+		//Upgrade websocket
+		resp.Header.Set("Upgrade", resp.Header.Get("Upgrade"))
+		resp.Header.Set("Connection", "Upgrade")
 		return nil
 	}
 
